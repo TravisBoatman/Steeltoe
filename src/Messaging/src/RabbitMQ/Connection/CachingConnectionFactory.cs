@@ -544,7 +544,17 @@ namespace Steeltoe.Messaging.RabbitMQ.Connection
         #region Private
         private void Configure(RabbitOptions options)
         {
-            SetAddresses(options.DetermineAddresses());
+            var addresses = options.DetermineAddresses();
+            if (!string.IsNullOrEmpty(addresses))
+            {
+                SetAddresses(addresses);
+            }
+            else
+            {
+                _logger?.LogInformation("No addresses found, will be using the host+port properties for connections");
+                Addresses = null;
+            }
+
             IsPublisherConfirms = options.PublisherConfirms;
             IsPublisherReturns = options.PublisherReturns;
             var cacheChannel = options.Cache.Channel;
